@@ -1,8 +1,7 @@
 package com.khatib.springai.learning.controller.chat;
 
-import com.khatib.springai.learning.model.WeatherModel;
 import com.khatib.springai.learning.service.StockService;
-import com.khatib.springai.learning.service.WeatherService;
+import com.khatib.springai.learning.service.tools.BasicWeatherToolService;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class StandardQueryController {
 
     private final ChatClient chatClient;
-    private final WeatherService weatherService;
+    private final BasicWeatherToolService basicWeatherToolService;
     private final StockService stockService;
 
     /**
@@ -28,9 +27,9 @@ public class StandardQueryController {
      * @param chatModel: this project only has OpenAI configured, therefore
      *                 the ChatModel is OpenAIChatModel with default configs.
      */
-    public StandardQueryController(ChatModel chatModel, WeatherService weatherService, StockService stockService) {
+    public StandardQueryController(ChatModel chatModel, BasicWeatherToolService basicWeatherToolService, StockService stockService) {
         this.chatClient = ChatClient.builder(chatModel).build();
-        this.weatherService = weatherService;
+        this.basicWeatherToolService = basicWeatherToolService;
         this.stockService = stockService;
     }
 
@@ -92,16 +91,10 @@ public class StandardQueryController {
     public String toolUsageQuery(@PathVariable String content) {
         Message systemMessage = new SystemMessage("You are a helpful assistant that uses tools.");
 
-        WeatherModel weatherModel = chatClient
-                .prompt(content)
-                .messages(systemMessage)
-                .tools(weatherService, stockService)
-                .call().entity(WeatherModel.class);
-
         return chatClient
                 .prompt(content)
                 .messages(systemMessage)
-                .tools(weatherService, stockService)
+                .tools(basicWeatherToolService, stockService)
                 .call()
                 .content();
     }
@@ -120,14 +113,13 @@ public class StandardQueryController {
         ChatClient.CallResponseSpec callResponseSpec = chatClient
                 .prompt(content)
                 .messages(systemMessage)
-                .tools(weatherService, stockService)
+                .tools(basicWeatherToolService, stockService)
                 .call();
 
         ChatResponse chatResponse = callResponseSpec.chatResponse();
         assert chatResponse != null;
 
         StringBuilder toolCallsBuilder = new StringBuilder();
-//        toolCallsBuilder.append(callResponseSpec.content());
         toolCallsBuilder.append("\n");
         toolCallsBuilder.append("Following tools were used: ");
 
