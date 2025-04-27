@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Map;
 
 @Configuration
-public class TestConfig {
+public class VectorDBDataInitializerConfig {
 
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(TestConfig.class);
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(VectorDBDataInitializerConfig.class);
     private final PgVectorStore pgVectorStore;
 
-    public TestConfig(PgVectorStore pgVectorStore) {
+    public VectorDBDataInitializerConfig(PgVectorStore pgVectorStore) {
         this.pgVectorStore = pgVectorStore;
     }
 
